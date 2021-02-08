@@ -12,8 +12,9 @@ resource "random_string" "webapprnd" {
 }
 
 resource "azurerm_app_service_plan" "free" {
-    name                = "plan-free-${var.loc}"
-    location            =  var.loc
+    name                = "plan-free-${var.webapplocs[count.index]}-${count.index}"
+    count = 3
+    location            =  var.webapplocs[count.index]
     resource_group_name =  azurerm_resource_group.webapps.name
     tags                =  azurerm_resource_group.webapps.tags
 
@@ -26,10 +27,11 @@ resource "azurerm_app_service_plan" "free" {
 }
 
 resource "azurerm_app_service" "citadel" {
-    name                = "webapp-${random_string.webapprnd.result}-${var.loc}"
-    location            = var.loc
+    name                = "webapp-${random_string.webapprnd.result}-${var.loc}-${count.index}"
+    count = 3
+    location            = var.webapplocs[count.index]
     resource_group_name = azurerm_resource_group.webapps.name
     tags                = azurerm_resource_group.webapps.tags
 
-    app_service_plan_id = azurerm_app_service_plan.free.id
+    app_service_plan_id = azurerm_app_service_plan.free[count.index].id
 }
